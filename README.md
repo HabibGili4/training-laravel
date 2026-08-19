@@ -1,58 +1,513 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Training Laravel - Product CRUD
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Project training Laravel 13 yang mengimplementasikan **Product CRUD** dengan arsitektur **Repository Pattern** dan **Dependency Injection**.
 
-## About Laravel
+## Fitur
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- ✅ Create Product
+- ✅ Read All Products
+- ✅ Read Single Product
+- ✅ Update Product
+- ✅ Delete Product
+- ✅ Form Validation (Store & Update)
+- ✅ Feature Tests (8 tests, 24 assertions)
+- ✅ UI dengan Tailwind CSS
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech Stack
 
-## Learning Laravel
+| Tool | Version | Keterangan |
+|------|---------|------------|
+| PHP | 8.3+ | Bahasa pemrograman |
+| Laravel | 13.x | Framework |
+| PostgreSQL | 15+ | Database |
+| Tailwind CSS | 4.x | CSS Framework |
+| PHPUnit | 12.x | Testing Framework |
+| Node.js | 18+ | Untuk build assets |
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+---
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Arsitektur
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+Project ini mengikuti arsitektur **Layered Architecture** dengan Repository Pattern:
 
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+```
+Request
+   ↓
+Form Request        → Input Validation
+   ↓
+Controller          → HTTP Handler
+   ↓
+Service             → Business Logic
+   ↓
+Repository Interface → Contract (Kontrak)
+   ↓
+Eloquent Repository → Database Implementation
+   ↓
+Model               → Eloquent ORM
+   ↓
+Database            → PostgreSQL
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### Penjelasan Setiap Layer
 
-## Contributing
+| Layer | Lokasi | Tugas |
+|-------|--------|-------|
+| **Form Request** | `app/Http/Requests/` | Validasi input dari user |
+| **Controller** | `app/Http/Controllers/` | Menerima HTTP request, memanggil service |
+| **Service** | `app/Services/` | Business logic (aturan bisnis) |
+| **Repository Interface** | `app/Contracts/` | Kontrak untuk operasi database |
+| **Repository** | `app/Repositories/` | Implementasi query database |
+| **Model** | `app/Models/` | Representasi tabel database |
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Kenapa Pakai Repository Pattern?
 
-## Code of Conduct
+1. **Separation of Concerns** — Setiap layer punya tugas sendiri
+2. **Testability** — Mudah di-test karena pakai interface
+3. **Flexibility** — Bisa ganti database (MySQL, MongoDB) tanpa ubah service
+4. **Maintainability** — Code lebih rapi dan mudah dipahami
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+---
 
-## Security Vulnerabilities
+## Struktur Directory
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+```
+etalio-app/
+├── app/
+│   ├── Contracts/
+│   │   └── ProductRepositoryInterface.php    # Kontrak repository
+│   ├── Http/
+│   │   ├── Controllers/
+│   │   │   └── ProductController.php         # HTTP handler
+│   │   └── Requests/
+│   │       ├── StoreProductRequest.php       # Validasi create
+│   │       └── UpdateProductRequest.php      # Validasi update
+│   ├── Models/
+│   │   └── Product.php                       # Eloquent model
+│   ├── Providers/
+│   │   └── AppServiceProvider.php            # Service container binding
+│   ├── Repositories/
+│   │   └── Eloquent/
+│   │       └── EloquentProductRepository.php # Implementasi database
+│   └── Services/
+│       └── ProductService.php                # Business logic
+├── database/
+│   ├── factories/
+│   │   └── ProductFactory.php                # Fake data untuk testing
+│   └── migrations/
+│       └── 2026_08_19_000001_create_products_table.php
+├── resources/
+│   └── views/
+│       └── products/
+│           └── index.blade.php               # UI Product
+├── routes/
+│   ├── api.php                               # API routes
+│   └── web.php                               # Web routes
+└── tests/
+    └── Feature/
+        └── ProductTest.php                   # Feature tests
+```
+
+---
+
+## Cara Setup
+
+### Prasyarat
+
+Pastikan sudah terinstall:
+- PHP 8.3 atau lebih tinggi
+- Composer
+- Node.js & npm
+- PostgreSQL
+
+### Step 1: Clone Repository
+
+```bash
+git clone https://github.com/HabibGili4/training-laravel.git
+cd training-laravel
+```
+
+### Step 2: Install Dependencies PHP
+
+```bash
+composer install
+```
+
+### Step 3: Install Dependencies Node
+
+```bash
+npm install
+```
+
+### Step 4: Copy Environment File
+
+```bash
+cp .env.example .env
+```
+
+### Step 5: Generate Application Key
+
+```bash
+php artisan key:generate
+```
+
+### Step 6: Konfigurasi Database
+
+Buka file `.env` dan sesuaikan konfigurasi database:
+
+```env
+DB_CONNECTION=pgsql
+DB_HOST=127.0.0.1
+DB_PORT=5432
+DB_DATABASE=etalio_app
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+```
+
+**Pastikan database sudah dibuat di PostgreSQL:**
+
+```bash
+# Login ke PostgreSQL
+psql -U your_username
+
+# Buat database
+CREATE DATABASE etalio_app;
+
+# Exit
+\q
+```
+
+### Step 7: Jalankan Migration
+
+```bash
+php artisan migrate
+```
+
+### Step 8: Build Frontend Assets
+
+```bash
+npm run build
+```
+
+### Step 9: Jalankan Development Server
+
+```bash
+php artisan serve
+```
+
+### Step 10: Akses Aplikasi
+
+- **UI Product**: http://localhost:8000/products
+- **API**: http://localhost:8000/api/products
+
+---
+
+## API Endpoints
+
+### Base URL
+
+```
+http://localhost:8000/api
+```
+
+### Endpoints
+
+| Method | URI | Description | Request Body |
+|--------|-----|-------------|--------------|
+| `POST` | `/products` | Buat produk baru | `{"name": "...", "price": ..., "stock": ...}` |
+| `GET` | `/products` | Ambil semua produk | - |
+| `GET` | `/products/{id}` | Ambil satu produk | - |
+| `PUT` | `/products/{id}` | Update produk | `{"name": "...", "price": ..., "stock": ...}` |
+| `DELETE` | `/products/{id}` | Hapus produk | - |
+
+### Contoh Request & Response
+
+#### Create Product
+
+**Request:**
+```bash
+curl -X POST http://localhost:8000/api/products \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"name": "Kopi Arabica", "price": 25000, "stock": 10}'
+```
+
+**Response (201 Created):**
+```json
+{
+    "success": true,
+    "message": "Product created successfully",
+    "data": {
+        "id": 1,
+        "name": "Kopi Arabica",
+        "price": "25000.00",
+        "stock": 10,
+        "created_at": "2026-08-19T10:00:00.000000Z",
+        "updated_at": "2026-08-19T10:00:00.000000Z"
+    }
+}
+```
+
+#### Get All Products
+
+**Request:**
+```bash
+curl http://localhost:8000/api/products
+```
+
+**Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Products retrieved successfully",
+    "data": [
+        {
+            "id": 1,
+            "name": "Kopi Arabica",
+            "price": "25000.00",
+            "stock": 10
+        }
+    ]
+}
+```
+
+#### Get Product by ID
+
+**Request:**
+```bash
+curl http://localhost:8000/api/products/1
+```
+
+**Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Product retrieved successfully",
+    "data": {
+        "id": 1,
+        "name": "Kopi Arabica",
+        "price": "25000.00",
+        "stock": 10
+    }
+}
+```
+
+#### Update Product
+
+**Request:**
+```bash
+curl -X PUT http://localhost:8000/api/products/1 \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"name": "Kopi Robusta", "price": 30000, "stock": 20}'
+```
+
+**Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Product updated successfully",
+    "data": {
+        "id": 1,
+        "name": "Kopi Robusta",
+        "price": "30000.00",
+        "stock": 20
+    }
+}
+```
+
+#### Delete Product
+
+**Request:**
+```bash
+curl -X DELETE http://localhost:8000/api/products/1 \
+  -H "Accept: application/json"
+```
+
+**Response (200 OK):**
+```json
+{
+    "success": true,
+    "message": "Product deleted successfully"
+}
+```
+
+### Validation Error
+
+**Request:**
+```bash
+curl -X POST http://localhost:8000/api/products \
+  -H "Content-Type: application/json" \
+  -H "Accept: application/json" \
+  -d '{"name": "", "price": -100, "stock": -5}'
+```
+
+**Response (422 Unprocessable Entity):**
+```json
+{
+    "success": false,
+    "message": "Validation failed",
+    "errors": {
+        "name": ["Nama produk wajib diisi."],
+        "price": ["Harga produk tidak boleh negatif."],
+        "stock": ["Stok produk tidak boleh negatif."]
+    }
+}
+```
+
+### 404 Not Found
+
+**Request:**
+```bash
+curl http://localhost:8000/api/products/9999
+```
+
+**Response (404 Not Found):**
+```json
+{
+    "success": false,
+    "message": "Product not found"
+}
+```
+
+---
+
+## Testing
+
+### Jalankan Semua Tests
+
+```bash
+php artisan test
+```
+
+### Jalankan Tests Tertentu
+
+```bash
+# Jalankan hanya ProductTest
+php artisan test --filter=ProductTest
+
+# Jalankan test tertentu
+php artisan test --filter=test_create_product_success
+```
+
+### Test Coverage
+
+| Test | Description |
+|------|-------------|
+| `test_create_product_success` | Test create produk berhasil |
+| `test_create_product_validation_error` | Test validasi error saat create |
+| `test_get_products_success` | Test ambil semua produk |
+| `test_get_product_by_id_success` | Test ambil produk berdasarkan ID |
+| `test_get_product_by_id_not_found` | Test 404 jika produk tidak ditemukan |
+| `test_update_product_success` | Test update produk berhasil |
+| `test_update_product_validation_error` | Test validasi error saat update |
+| `test_delete_product_success` | Test hapus produk berhasil |
+
+**Total: 8 tests, 24 assertions** ✅
+
+---
+
+## Troubleshooting
+
+### 1. Database Connection Failed
+
+**Error:**
+```
+SQLSTATE[08006] connection refused
+```
+
+**Solusi:**
+- Pastikan PostgreSQL sudah running
+- Cek konfigurasi di `.env` (host, port, username, password)
+- Pastikan database sudah dibuat
+
+### 2. Port 8000 Sudah Digunakan
+
+**Error:**
+```
+Address already in use
+```
+
+**Solusi:**
+```bash
+# Gunakan port lain
+php artisan serve --port=8001
+```
+
+### 3. Migration Gagal
+
+**Error:**
+```
+Table already exists
+```
+
+**Solusi:**
+```bash
+# Rollback migration lalu jalankan ulang
+php artisan migrate:refresh
+```
+
+### 4. PHP Extension Tidak Terinstall
+
+**Error:**
+```
+Class 'pgsql' not found
+```
+
+**Solusi:**
+```bash
+# Ubuntu/Debian
+sudo apt-get install php-pgsql
+
+# macOS
+brew install php
+```
+
+### 5. Node Modules Error
+
+**Solusi:**
+```bash
+# Hapus node_modules lalu install ulang
+rm -rf node_modules
+npm install
+```
+
+---
+
+## Flow Development
+
+Ketika menambahkan fitur baru, ikuti urutan ini:
+
+1. **Migration** — Buat/tabel database
+2. **Model** — Buat Eloquent model
+3. **Repository Interface** — Buat kontrak di `app/Contracts/`
+4. **Repository** — Buat implementasi di `app/Repositories/`
+5. **Service** — Buat business logic di `app/Services/`
+6. **Form Request** — Buat validasi di `app/Http/Requests/`
+7. **Controller** — Buat HTTP handler di `app/Http/Controllers/`
+8. **Routes** — Daftarkan route di `routes/api.php`
+9. **Tests** — Buat tests di `tests/Feature/`
+10. **UI** — Buat view di `resources/views/`
+
+---
+
+## Kontribusi
+
+1. Fork repository ini
+2. Buat branch baru (`git checkout -b feature/nama-fitur`)
+3. Commit perubahan (`git commit -m 'feat: tambah fitur baru'`)
+4. Push ke branch (`git push origin feature/nama-fitur`)
+5. Buat Pull Request
+
+---
 
 ## License
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+MIT License
+
+---
+
+## Author
+
+**HabibGili4** - [GitHub](https://github.com/HabibGili4)
