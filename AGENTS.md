@@ -21,19 +21,16 @@ php artisan test --filter=test_create_product_success  # single test
 
 ## Architecture
 
-Product CRUD follows Repository Pattern:
+Product CRUD follows this flow:
 
 ```
-Form Request → Controller → Service → Repository Interface → Eloquent Repository → Model
+Routes → Form Request → Controller → Service → Model → Database
 ```
 
-- **Contracts** (`app/Contracts/`): Interfaces for dependency inversion
-- **Services** (`app/Services/`): Business logic only, no direct DB queries
-- **Repositories** (`app/Repositories/Eloquent/`): All Eloquent queries live here
-- **Controllers** (`app/Http/Controllers/`): HTTP layer only, delegates to services
 - **Form Requests** (`app/Http/Requests/`): Validation rules, no business logic
-
-Binding is in `AppServiceProvider::register()` — if you add a new repository, bind it there.
+- **Controllers** (`app/Http/Controllers/`): HTTP layer only, delegates to services
+- **Services** (`app/Services/`): Business logic, uses Eloquent directly
+- **Models** (`app/Models/`): Eloquent ORM, represents database tables
 
 ## Database
 
@@ -50,19 +47,16 @@ Binding is in `AppServiceProvider::register()` — if you add a new repository, 
 
 ## Adding a New Entity (e.g., Category)
 
-Follow this exact order:
+Follow this order:
 
 1. Migration → `database/migrations/`
 2. Model → `app/Models/`
-3. Repository Interface → `app/Contracts/`
-4. Repository Implementation → `app/Repositories/Eloquent/`
-5. Service → `app/Services/`
-6. Form Requests → `app/Http/Requests/`
-7. Controller → `app/Http/Controllers/`
-8. Routes → `routes/api.php` (use `Route::apiResource`)
-9. Binding → `app/Providers/AppServiceProvider.php`
-10. Tests → `tests/Feature/`
-11. Factory → `database/factories/`
+3. Service → `app/Services/`
+4. Form Requests → `app/Http/Requests/`
+5. Controller → `app/Http/Controllers/`
+6. Routes → `routes/api.php` (use `Route::apiResource`)
+7. Tests → `tests/Feature/`
+8. Factory → `database/factories/`
 
 ## Key Conventions
 
@@ -70,4 +64,4 @@ Follow this exact order:
 - Casts use method: `protected function casts(): array` (not `$casts` property)
 - API responses always wrap in `{"success": bool, "message": string, "data": ...}`
 - Validation messages are in Bahasa Indonesia
-- No business logic in controllers or repositories — keep it in services
+- No business logic in controllers — keep it in services

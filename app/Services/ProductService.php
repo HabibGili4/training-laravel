@@ -2,46 +2,41 @@
 
 namespace App\Services;
 
-use App\Contracts\ProductRepositoryInterface;
+use App\Models\Product;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 
 class ProductService
 {
-    public function __construct(
-        private readonly ProductRepositoryInterface $productRepository,
-    ) {}
-
     /**
      * Get all products.
      *
-     * @return Collection<int, Model>
+     * @return Collection<int, Product>
      */
     public function getProducts(): Collection
     {
-        return $this->productRepository->getAll();
+        return Product::all();
     }
 
     /**
      * Get product by ID.
      *
      * @param  int  $id
-     * @return Model|null
+     * @return Product|null
      */
-    public function getProduct(int $id): ?Model
+    public function getProduct(int $id): ?Product
     {
-        return $this->productRepository->findById($id);
+        return Product::find($id);
     }
 
     /**
      * Create a new product.
      *
      * @param  array<string, mixed>  $data
-     * @return Model
+     * @return Product
      */
-    public function createProduct(array $data): Model
+    public function createProduct(array $data): Product
     {
-        return $this->productRepository->create($data);
+        return Product::create($data);
     }
 
     /**
@@ -49,11 +44,16 @@ class ProductService
      *
      * @param  int  $id
      * @param  array<string, mixed>  $data
-     * @return Model
+     * @return Product
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function updateProduct(int $id, array $data): Model
+    public function updateProduct(int $id, array $data): Product
     {
-        return $this->productRepository->update($id, $data);
+        $product = Product::findOrFail($id);
+        $product->update($data);
+
+        return $product;
     }
 
     /**
@@ -61,9 +61,13 @@ class ProductService
      *
      * @param  int  $id
      * @return bool
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function deleteProduct(int $id): bool
     {
-        return $this->productRepository->delete($id);
+        $product = Product::findOrFail($id);
+
+        return $product->delete();
     }
 }

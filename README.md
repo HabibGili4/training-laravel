@@ -1,6 +1,6 @@
 # Training Laravel - Product CRUD
 
-Project training Laravel 13 yang mengimplementasikan **Product CRUD** dengan arsitektur **Repository Pattern** dan **Dependency Injection**.
+Project training Laravel 13 yang mengimplementasikan **Product CRUD** dengan arsitektur sederhana dan clean.
 
 ## Fitur
 
@@ -30,10 +30,10 @@ Project training Laravel 13 yang mengimplementasikan **Product CRUD** dengan ars
 
 ## Arsitektur
 
-Project ini mengikuti arsitektur **Layered Architecture** dengan Repository Pattern:
+Project ini mengikuti arsitektur **Layered Architecture** yang sederhana:
 
 ```
-Request
+Routes
    ↓
 Form Request        → Input Validation
    ↓
@@ -41,11 +41,7 @@ Controller          → HTTP Handler
    ↓
 Service             → Business Logic
    ↓
-Repository Interface → Contract (Kontrak)
-   ↓
-Eloquent Repository → Database Implementation
-   ↓
-Model               → Eloquent ORM
+Model / Eloquent    → Database Query
    ↓
 Database            → PostgreSQL
 ```
@@ -56,27 +52,23 @@ Database            → PostgreSQL
 |-------|--------|-------|
 | **Form Request** | `app/Http/Requests/` | Validasi input dari user |
 | **Controller** | `app/Http/Controllers/` | Menerima HTTP request, memanggil service |
-| **Service** | `app/Services/` | Business logic (aturan bisnis) |
-| **Repository Interface** | `app/Contracts/` | Kontrak untuk operasi database |
-| **Repository** | `app/Repositories/` | Implementasi query database |
-| **Model** | `app/Models/` | Representasi tabel database |
+| **Service** | `app/Services/` | Business logic, langsung pakai Eloquent |
+| **Model** | `app/Models/` | Representasi tabel database, Eloquent ORM |
 
-### Kenapa Pakai Repository Pattern?
+### Kenapa Arsitektur Ini?
 
-1. **Separation of Concerns** — Setiap layer punya tugas sendiri
-2. **Testability** — Mudah di-test karena pakai interface
-3. **Flexibility** — Bisa ganti database (MySQL, MongoDB) tanpa ubah service
-4. **Maintainability** — Code lebih rapi dan mudah dipahami
+1. **Sederhana** — Tidak ada layer yang tidak perlu
+2. **Mudah Dipahami** — Junior programmer langsung paham
+3. **Cukup untuk CRUD** — Tidak over-engineering
+4. **Maintainable** — Code tetap rapi dan terorganisir
 
 ---
 
 ## Struktur Directory
 
 ```
-etalio-app/
+training-laravel/
 ├── app/
-│   ├── Contracts/
-│   │   └── ProductRepositoryInterface.php    # Kontrak repository
 │   ├── Http/
 │   │   ├── Controllers/
 │   │   │   └── ProductController.php         # HTTP handler
@@ -86,10 +78,7 @@ etalio-app/
 │   ├── Models/
 │   │   └── Product.php                       # Eloquent model
 │   ├── Providers/
-│   │   └── AppServiceProvider.php            # Service container binding
-│   ├── Repositories/
-│   │   └── Eloquent/
-│   │       └── EloquentProductRepository.php # Implementasi database
+│   │   └── AppServiceProvider.php            # Service provider
 │   └── Services/
 │       └── ProductService.php                # Business logic
 ├── database/
@@ -481,14 +470,12 @@ Ketika menambahkan fitur baru, ikuti urutan ini:
 
 1. **Migration** — Buat/tabel database
 2. **Model** — Buat Eloquent model
-3. **Repository Interface** — Buat kontrak di `app/Contracts/`
-4. **Repository** — Buat implementasi di `app/Repositories/`
-5. **Service** — Buat business logic di `app/Services/`
-6. **Form Request** — Buat validasi di `app/Http/Requests/`
-7. **Controller** — Buat HTTP handler di `app/Http/Controllers/`
-8. **Routes** — Daftarkan route di `routes/api.php`
-9. **Tests** — Buat tests di `tests/Feature/`
-10. **UI** — Buat view di `resources/views/`
+3. **Service** — Buat business logic di `app/Services/`
+4. **Form Request** — Buat validasi di `app/Http/Requests/`
+5. **Controller** — Buat HTTP handler di `app/Http/Controllers/`
+6. **Routes** — Daftarkan route di `routes/api.php`
+7. **Tests** — Buat tests di `tests/Feature/`
+8. **UI** — Buat view di `resources/views/`
 
 ---
 
